@@ -2,6 +2,39 @@
 
 **Kunai** is a fast, secure, Rust + Tauri v2 smart code & text editor inspired by **Sublime Text**, **Zed**, and **Notepad++** — with true multi-cursor editing, modern language & web format support, secure pretty-printed previews, and built-in developer utilities.
 
+![Kunai Multi-Cursor Dark Editor](docs/screenshots/dark-editor-multicursor.png)
+
+---
+
+## Screenshots
+
+### Always-Preview Mode & Side-by-Side Pretty Formatting (`Ctrl+Shift+V`)
+Open safe structured formats directly in full-pane pretty-printed preview (`Auto-Preview`), then press `Ctrl+Shift+V` to edit raw/minified markup alongside a live pretty-printed preview:
+
+![Kunai Full-Pane Auto-Preview](docs/screenshots/auto-preview-pretty.png)
+
+![Kunai Side-by-Side Pretty Preview](docs/screenshots/side-by-side-pretty-preview.png)
+
+### Interactive JSON / YAML / TOML Tree Inspector & JSONPath Query
+Inspect nested data structures, run live JSONPath queries (`$.services[*].name`), and convert between JSON, YAML, TOML, and CSV in one click:
+
+![Kunai JSON Tree Inspector and JSONPath Query](docs/screenshots/json-tree-inspector.png)
+
+### Command Palette (`Ctrl+Shift+P`) & Notepad++ Utility Toolbox
+Fuzzy-search commands or apply instant line, case, regex filter, Base64/URL/JWT, and hash transforms directly to your selection or buffer:
+
+![Kunai Command Palette and Notepad++ Utility Toolbox](docs/screenshots/command-palette-toolbox.png)
+
+### Catppuccin Latte Light Theme & Side-by-Side Diff Viewer
+Compare against saved versions, other open tabs, or clipboard with side-by-side and unified diff views across 4 built-in themes:
+
+![Kunai Light Theme and Side-by-Side Diff Viewer](docs/screenshots/light-theme-diff.png)
+
+### Built-in Script & Executable Preview Protection
+Scriptable and executable files (`.html`, `.svg`, `.js`, `.ts`, `.sh`, `.rs`, etc.) are strictly blocked from preview — zero `<iframe>` or script execution:
+
+![Kunai Script Blocking Security Protection](docs/screenshots/script-blocking-security.png)
+
 ---
 
 ## Key Features
