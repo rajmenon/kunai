@@ -1,0 +1,187 @@
+/* ==========================================================================
+   Kunai — Theme Tokens (Zed One Dark, Sublime Mariana, Tokyo Night, Catppuccin Latte)
+   ========================================================================== */
+
+:root,
+[data-theme="zed-dark"] {
+  color-scheme: dark;
+
+  --bg-primary: #1a1d24;
+  --bg-secondary: #14171d;
+  --bg-tertiary: #111318;
+  --bg-elevated: #222630;
+  --bg-hover: #282d39;
+  --bg-active: #2e3443;
+  --bg-selection: rgba(96, 165, 250, 0.22);
+  --bg-badge: #262c38;
+
+  --border: #282d38;
+  --border-subtle: #20242e;
+  --border-strong: #3a4152;
+
+  --text-primary: #dce3ef;
+  --text-secondary: #a1acc0;
+  --text-muted: #6c778c;
+  --text-inverse: #0f1218;
+
+  --accent: #60a5fa;
+  --accent-hover: #7bb6fc;
+  --accent-soft: rgba(96, 165, 250, 0.14);
+  --accent-border: rgba(96, 165, 250, 0.42);
+
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.14);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.14);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.16);
+  --purple: #c084fc;
+  --cyan: #38bdf8;
+  --orange: #fb923c;
+
+  --diff-add-bg: rgba(74, 222, 128, 0.13);
+  --diff-add-gutter: rgba(74, 222, 128, 0.24);
+  --diff-del-bg: rgba(248, 113, 113, 0.14);
+  --diff-del-gutter: rgba(248, 113, 113, 0.24);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.56);
+
+  --font-sans: "Inter", "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+}
+
+[data-theme="sublime-mariana"] {
+  color-scheme: dark;
+
+  --bg-primary: #303841;
+  --bg-secondary: #282f37;
+  --bg-tertiary: #22282f;
+  --bg-elevated: #38414c;
+  --bg-hover: #3f4955;
+  --bg-active: #475260;
+  --bg-selection: rgba(102, 153, 204, 0.28);
+  --bg-badge: #3b4450;
+
+  --border: #404a56;
+  --border-subtle: #353e49;
+  --border-strong: #536070;
+
+  --text-primary: #d8dee9;
+  --text-secondary: #a6b2c0;
+  --text-muted: #7c8998;
+  --text-inverse: #1c2127;
+
+  --accent: #6699cc;
+  --accent-hover: #7cacdc;
+  --accent-soft: rgba(102, 153, 204, 0.18);
+  --accent-border: rgba(102, 153, 204, 0.45);
+
+  --success: #99c794;
+  --success-soft: rgba(153, 199, 148, 0.16);
+  --warning: #fac761;
+  --warning-soft: rgba(250, 199, 97, 0.16);
+  --danger: #ec5f66;
+  --danger-soft: rgba(236, 95, 102, 0.18);
+  --purple: #c695c6;
+  --cyan: #5fb4b4;
+  --orange: #f9ae58;
+
+  --diff-add-bg: rgba(153, 199, 148, 0.15);
+  --diff-add-gutter: rgba(153, 199, 148, 0.28);
+  --diff-del-bg: rgba(236, 95, 102, 0.16);
+  --diff-del-gutter: rgba(236, 95, 102, 0.28);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="tokyo-night"] {
+  color-scheme: dark;
+
+  --bg-primary: #1a1b26;
+  --bg-secondary: #16161e;
+  --bg-tertiary: #12121a;
+  --bg-elevated: #24283b;
+  --bg-hover: #292e42;
+  --bg-active: #333952;
+  --bg-selection: rgba(122, 162, 247, 0.24);
+  --bg-badge: #262b40;
+
+  --border: #292e42;
+  --border-subtle: #1f2335;
+  --border-strong: #414868;
+
+  --text-primary: #c0caf5;
+  --text-secondary: #9aa5ce;
+  --text-muted: #565f89;
+  --text-inverse: #13141c;
+
+  --accent: #7aa2f7;
+  --accent-hover: #8db0fa;
+  --accent-soft: rgba(122, 162, 247, 0.16);
+  --accent-border: rgba(122, 162, 247, 0.45);
+
+  --success: #9ece6a;
+  --success-soft: rgba(158, 206, 106, 0.15);
+  --warning: #e0af68;
+  --warning-soft: rgba(224, 175, 104, 0.15);
+  --danger: #f7768e;
+  --danger-soft: rgba(247, 118, 142, 0.16);
+  --purple: #bb9af7;
+  --cyan: #7dcfff;
+  --orange: #ff9e64;
+
+  --diff-add-bg: rgba(158, 206, 106, 0.14);
+  --diff-add-gutter: rgba(158, 206, 106, 0.25);
+  --diff-del-bg: rgba(247, 118, 142, 0.15);
+  --diff-del-gutter: rgba(247, 118, 142, 0.25);
+
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.42);
+  --shadow-lg: 0 18px 54px rgba(0, 0, 0, 0.65);
+}
+
+[data-theme="catppuccin-latte"] {
+  color-scheme: light;
+
+  --bg-primary: #eff1f5;
+  --bg-secondary: #e6e9ef;
+  --bg-tertiary: #dce0e8;
+  --bg-elevated: #ffffff;
+  --bg-hover: #dde1ea;
+  --bg-active: #ccd0da;
+  --bg-selection: rgba(30, 102, 245, 0.16);
+  --bg-badge: #dce0e8;
+
+  --border: #ccd0da;
+  --border-subtle: #d8dce6;
+  --border-strong: #acb0be;
+
+  --text-primary: #4c4f69;
+  --text-secondary: #5c5f77;
+  --text-muted: #7c7f93;
+  --text-inverse: #ffffff;
+
+  --accent: #1e66f5;
+  --accent-hover: #1754d4;
+  --accent-soft: rgba(30, 102, 245, 0.11);
+  --accent-border: rgba(30, 102, 245, 0.35);
+
+  --success: #40a02b;
+  --success-soft: rgba(64, 160, 43, 0.12);
+  --warning: #df8e1d;
+  --warning-soft: rgba(223, 142, 29, 0.13);
+  --danger: #d20f39;
+  --danger-soft: rgba(210, 15, 57, 0.11);
+  --purple: #8839ef;
+  --cyan: #04a5e5;
+  --orange: #fe640b;
+
+  --diff-add-bg: rgba(64, 160, 43, 0.12);
+  --diff-add-gutter: rgba(64, 160, 43, 0.22);
+  --diff-del-bg: rgba(210, 15, 57, 0.1);
+  --diff-del-gutter: rgba(210, 15, 57, 0.2);
+
+  --shadow-sm: 0 2px 8px rgba(76, 79, 105, 0.1);
+  --shadow-lg: 0 16px 40px rgba(76, 79, 105, 0.18);
+}

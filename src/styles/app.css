@@ -1,0 +1,661 @@
+/* ==========================================================================
+   Kunai — Application Layout & Workbench Styles (Zed / Sublime Aesthetic)
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+/* Custom thin scrollbars */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 138, 158, 0.26);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 138, 158, 0.48);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ==========================================================================
+   App Shell
+   ========================================================================== */
+
+.kunai-app {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  position: relative;
+}
+
+.kunai-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.kunai-workbench {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.kunai-workspace-split {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.kunai-primary-pane {
+  flex: 1;
+  min-width: 260px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.kunai-secondary-pane {
+  min-width: 260px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+}
+
+.kunai-secondary-header {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.kunai-secondary-select {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 5px;
+  padding: 2px 8px;
+  font-size: 12px;
+  outline: none;
+  max-width: 240px;
+}
+
+.kunai-secondary-select:focus {
+  border-color: var(--accent);
+}
+
+/* Resize Handles */
+.kunai-resize-handle {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 15;
+  transition: background 120ms ease;
+}
+
+.kunai-resize-handle:hover,
+.kunai-resize-handle.dragging {
+  background: var(--accent);
+}
+
+/* ==========================================================================
+   Core Editor Pane + Minimap
+   ========================================================================== */
+
+.kunai-editor-pane {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.kunai-editor-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.kunai-cm-host {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.kunai-cm-host .cm-editor {
+  height: 100%;
+  outline: none !important;
+}
+
+.kunai-minimap {
+  width: 86px;
+  flex-shrink: 0;
+  position: relative;
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border-subtle);
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+}
+
+.kunai-minimap-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.kunai-minimap-slider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--accent-soft);
+  border-top: 1px solid var(--accent-border);
+  border-bottom: 1px solid var(--accent-border);
+  pointer-events: none;
+  transition: background 120ms ease;
+}
+
+.kunai-minimap:hover .kunai-minimap-slider {
+  background: rgba(96, 165, 250, 0.22);
+}
+
+/* ==========================================================================
+   Find & Replace Floating Bar
+   ========================================================================== */
+
+.kunai-find-bar {
+  position: absolute;
+  top: 8px;
+  right: 18px;
+  z-index: 30;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 6px 8px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 410px;
+  max-width: calc(100% - 36px);
+}
+
+.kunai-find-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.kunai-find-spacer {
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.kunai-find-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0 4px 0 8px;
+  min-width: 170px;
+}
+
+.kunai-find-input-wrap:focus-within {
+  border-color: var(--accent);
+}
+
+.kunai-find-input-wrap.has-error {
+  border-color: var(--danger);
+}
+
+.kunai-find-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 5px 4px 5px 0;
+  outline: none;
+  min-width: 0;
+}
+
+.kunai-find-toggles {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.kunai-find-toggle {
+  width: 22px;
+  height: 22px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.kunai-find-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.kunai-find-toggle.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.kunai-find-count {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  min-width: 58px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.kunai-find-count.empty {
+  color: var(--danger);
+}
+
+.kunai-find-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.kunai-find-action-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.kunai-find-action-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ==========================================================================
+   Shared Controls & Badges
+   ========================================================================== */
+
+.kunai-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  transition: background 110ms ease, color 110ms ease, border-color 110ms ease;
+}
+
+.kunai-icon-btn.sm {
+  width: 24px;
+  height: 24px;
+}
+
+.kunai-icon-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.kunai-icon-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.kunai-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.kunai-kbd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg-badge);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Empty State & Drag-Drop Overlay
+   ========================================================================== */
+
+.kunai-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--text-muted);
+  padding: 32px;
+  user-select: none;
+}
+
+.kunai-empty-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.kunai-empty-shortcuts {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 8px 20px;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.kunai-drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(15, 18, 26, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.kunai-drop-card {
+  padding: 28px 42px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 2px dashed var(--accent);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ==========================================================================
+   Toast Notifications
+   ========================================================================== */
+
+.kunai-toast-stack {
+  position: fixed;
+  right: 16px;
+  bottom: 38px;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 360px;
+}
+
+.kunai-toast {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 13px;
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--accent);
+  box-shadow: var(--shadow-lg);
+  animation: kunaiToastIn 160ms ease-out;
+}
+
+.kunai-toast.success {
+  border-left-color: var(--success);
+}
+
+.kunai-toast.error {
+  border-left-color: var(--danger);
+}
+
+.kunai-toast.warning {
+  border-left-color: var(--warning);
+}
+
+.kunai-toast-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.kunai-toast-detail {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  word-break: break-word;
+}
+
+@keyframes kunaiToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Full-Pane Preview, Pretty-Printed Code & Security Blocked Notice
+   ========================================================================== */
+
+.kunai-full-preview-pane {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.kunai-pretty-code {
+  margin: 0;
+  padding: 12px 0 32px 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: auto;
+  flex: 1;
+}
+
+.kunai-pretty-line {
+  display: flex;
+  padding: 0 16px 0 0;
+  min-height: 20px;
+}
+
+.kunai-pretty-line:hover {
+  background: var(--bg-hover);
+}
+
+.kunai-pretty-ln {
+  width: 48px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-right: 14px;
+  color: var(--text-muted);
+  user-select: none;
+  font-size: 11.5px;
+}
+
+.kunai-pretty-content {
+  white-space: pre;
+  tab-size: 2;
+  flex: 1;
+  min-width: 0;
+}
+
+.kunai-pretty-code .tok-key,
+.kunai-pretty-code .tok-prop,
+.kunai-pretty-code .tok-attr {
+  color: var(--accent);
+}
+
+.kunai-pretty-code .tok-string {
+  color: var(--success);
+}
+
+.kunai-pretty-code .tok-number {
+  color: var(--orange);
+}
+
+.kunai-pretty-code .tok-bool,
+.kunai-pretty-code .tok-null,
+.kunai-pretty-code .tok-keyword,
+.kunai-pretty-code .tok-section {
+  color: var(--purple);
+  font-weight: 500;
+}
+
+.kunai-pretty-code .tok-comment {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.kunai-pretty-code .tok-tag,
+.kunai-pretty-code .tok-selector {
+  color: var(--danger);
+}
+
+.kunai-pretty-code .tok-punct {
+  color: var(--text-secondary);
+}
+
+.kunai-security-blocked {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 36px 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+}
+
+.kunai-security-blocked-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--warning-soft);
+  color: var(--warning);
+  border: 1px solid var(--border);
+}
+
+.kunai-autopreview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+}
+
