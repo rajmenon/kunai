@@ -28,12 +28,14 @@ import {
   deleteFsEntry,
   formatDocument,
   getDemoWorkspaceInfo,
+  isPdfPath,
   isTauriRuntime,
   listWorkspaceTree,
   pickOpenFile,
   pickOpenFolder,
   pickSaveAsPath,
   queryJson,
+  readBinaryFile,
   readFileSmart,
   searchWorkspace,
   transformText,
@@ -55,6 +57,8 @@ import { StatusBar } from "./components/chrome/StatusBar";
 import { Sidebar } from "./components/panels/Sidebar";
 import { CommandPalette } from "./components/overlays/CommandPalette";
 import { FormatPreview } from "./components/previews/FormatPreview";
+import { PdfViewer } from "./components/previews/PdfViewer";
+import { uint8ArrayToBase64 } from "./utils/samplePdf";
 
 const SETTINGS_STORAGE_KEY = "kunai-settings-v1";
 
@@ -385,7 +389,7 @@ export default function App() {
 
   // Live debounced document stats & validation for active tab
   useEffect(() => {
-    if (!activeTab) {
+    if (!activeTab || activeTab.isBinary) {
       setDocStats(null);
       return;
     }
@@ -475,6 +479,31 @@ export default function App() {
         return;
       }
       try {
+        if (isPdfPath(path)) {
+          const bin = await readBinaryFile(path);
+          const newTab: EditorTab = {
+            id: makeTabId(),
+            title: bin.name,
+            path: bin.path,
+            content: "",
+            savedContent: "",
+            language: "pdf",
+            encoding: "UTF-8",
+            lineEnding: "LF",
+            isDirty: false,
+            isPinned: false,
+            cursorLine: 1,
+            cursorCol: 1,
+            cursorCount: 1,
+            selectionLength: 0,
+            isBinary: true,
+            binaryBase64: bin.base64,
+            sizeBytes: bin.size_bytes,
+          };
+          setTabs((prev) => [...prev, newTab]);
+          setActiveTabId(newTab.id);
+          return;
+        }
         const payload = await readFileSmart(path);
         const newTab: EditorTab = {
           id: makeTabId(),
@@ -507,13 +536,40 @@ export default function App() {
 
   const handleOpenFileDialog = useCallback(async () => {
     try {
-      const payload = await pickOpenFile();
-      if (!payload) return;
-      const existing = tabs.find((t) => t.path === payload.path);
+      const picked = await pickOpenFile();
+      if (!picked) return;
+      const existing = tabs.find((t) => t.path === picked.payload.path);
       if (existing) {
         setActiveTabId(existing.id);
         return;
       }
+      if (picked.kind === "binary") {
+        const bin = picked.payload;
+        const newTab: EditorTab = {
+          id: makeTabId(),
+          title: bin.name,
+          path: bin.path,
+          content: "",
+          savedContent: "",
+          language: "pdf",
+          encoding: "UTF-8",
+          lineEnding: "LF",
+          isDirty: false,
+          isPinned: false,
+          cursorLine: 1,
+          cursorCol: 1,
+          cursorCount: 1,
+          selectionLength: 0,
+          isBinary: true,
+          binaryBase64: bin.base64,
+          sizeBytes: bin.size_bytes,
+        };
+        setTabs((prev) => [...prev, newTab]);
+        setActiveTabId(newTab.id);
+        void refreshTree();
+        return;
+      }
+      const payload = picked.payload;
       const newTab: EditorTab = {
         id: makeTabId(),
         title: payload.name,
@@ -938,6 +994,31 @@ export default function App() {
     [showToast]
   );
 
+  const handleExtractPdfTextToTab = useCallback(
+    (extractedTitle: string, extractedText: string) => {
+      const newTab: EditorTab = {
+        id: makeTabId(),
+        title: extractedTitle,
+        path: null,
+        content: extractedText,
+        savedContent: "",
+        language: "plaintext",
+        encoding: "UTF-8",
+        lineEnding: "LF",
+        isDirty: true,
+        isPinned: false,
+        cursorLine: 1,
+        cursorCol: 1,
+        cursorCount: 1,
+        selectionLength: 0,
+      };
+      setTabs((prev) => [...prev, newTab]);
+      setActiveTabId(newTab.id);
+      showToast("Extracted PDF text", `Opened ${extractedTitle}`, "success");
+    },
+    [showToast]
+  );
+
   const handleChangeSplitMode = useCallback(
     (nextMode: SplitMode) => {
       if (nextMode === "preview") {
@@ -1034,6 +1115,11 @@ export default function App() {
         setSidebarOpen((v) => !v);
         return;
       }
+      if (mod && !e.shiftKey && e.key.toLowerCase() === "o") {
+        e.preventDefault();
+        void handleOpenFileDialog();
+        return;
+      }
       if (mod && !e.shiftKey && e.key.toLowerCase() === "s") {
         e.preventDefault();
         void handleSaveActiveFile();
@@ -1091,6 +1177,7 @@ export default function App() {
     handleCloseTab,
     handleFormatDocument,
     handleNewTab,
+    handleOpenFileDialog,
     handleSaveActiveFile,
     handleToggleAlwaysOpenInPreview,
     handleToggleSideBySidePreview,
@@ -1104,6 +1191,33 @@ export default function App() {
       const files = Array.from(e.dataTransfer.files);
       for (const file of files) {
         try {
+          if (isPdfPath(file.name)) {
+            const buffer = await file.arrayBuffer();
+            const base64 = uint8ArrayToBase64(new Uint8Array(buffer));
+            const newTab: EditorTab = {
+              id: makeTabId(),
+              title: file.name,
+              path: null,
+              content: "",
+              savedContent: "",
+              language: "pdf",
+              encoding: "UTF-8",
+              lineEnding: "LF",
+              isDirty: false,
+              isPinned: false,
+              cursorLine: 1,
+              cursorCol: 1,
+              cursorCount: 1,
+              selectionLength: 0,
+              isBinary: true,
+              binaryBase64: base64,
+              sizeBytes: file.size,
+            };
+            setTabs((prev) => [...prev, newTab]);
+            setActiveTabId(newTab.id);
+            showToast("Opened PDF", file.name, "success");
+            continue;
+          }
           const text = await file.text();
           const newTab: EditorTab = {
             id: makeTabId(),
@@ -1756,17 +1870,27 @@ export default function App() {
               <>
                 <div className="kunai-primary-pane">
                   {activeTab ? (
-                    <EditorPane
-                      ref={editorRef}
-                      tabId={activeTab.id}
-                      content={activeTab.content}
-                      language={activeTab.language}
-                      settings={settings}
-                      onChange={(val) => handleContentChange(activeTab.id, val)}
-                      onCursorChange={handleCursorChange}
-                      onValidate={validateDocument}
-                      onRequestFormat={() => void handleFormatDocument(false)}
-                    />
+                    activeTab.language === "pdf" && activeTab.binaryBase64 ? (
+                      <PdfViewer
+                        title={activeTab.title}
+                        base64Data={activeTab.binaryBase64}
+                        sizeBytes={activeTab.sizeBytes}
+                        onExtractTextToTab={handleExtractPdfTextToTab}
+                        onCopyText={handleCopyText}
+                      />
+                    ) : (
+                      <EditorPane
+                        ref={editorRef}
+                        tabId={activeTab.id}
+                        content={activeTab.content}
+                        language={activeTab.language}
+                        settings={settings}
+                        onChange={(val) => handleContentChange(activeTab.id, val)}
+                        onCursorChange={handleCursorChange}
+                        onValidate={validateDocument}
+                        onRequestFormat={() => void handleFormatDocument(false)}
+                      />
+                    )
                   ) : (
                     <div className="kunai-empty-state">
                       <div className="kunai-empty-title">Kunai</div>
@@ -1825,18 +1949,28 @@ export default function App() {
                                 <X size={14} />
                               </button>
                             </div>
-                            <EditorPane
-                              tabId={`split-${secondaryTab.id}`}
-                              content={secondaryTab.content}
-                              language={secondaryTab.language}
-                              settings={settings}
-                              onChange={(val) =>
-                                handleContentChange(secondaryTab.id, val)
-                              }
-                              onCursorChange={() => {}}
-                              onValidate={validateDocument}
-                              onRequestFormat={() => void handleFormatDocument(false)}
-                            />
+                            {secondaryTab.language === "pdf" && secondaryTab.binaryBase64 ? (
+                              <PdfViewer
+                                title={secondaryTab.title}
+                                base64Data={secondaryTab.binaryBase64}
+                                sizeBytes={secondaryTab.sizeBytes}
+                                onExtractTextToTab={handleExtractPdfTextToTab}
+                                onCopyText={handleCopyText}
+                              />
+                            ) : (
+                              <EditorPane
+                                tabId={`split-${secondaryTab.id}`}
+                                content={secondaryTab.content}
+                                language={secondaryTab.language}
+                                settings={settings}
+                                onChange={(val) =>
+                                  handleContentChange(secondaryTab.id, val)
+                                }
+                                onCursorChange={() => {}}
+                                onValidate={validateDocument}
+                                onRequestFormat={() => void handleFormatDocument(false)}
+                              />
+                            )}
                           </>
                         ) : (
                           <FormatPreview

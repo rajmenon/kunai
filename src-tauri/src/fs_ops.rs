@@ -1,3 +1,4 @@
+use base64::Engine as _;
 use encoding_rs::{UTF_16BE, UTF_16LE, UTF_8, WINDOWS_1252};
 use regex::RegexBuilder;
 use serde::{Deserialize, Serialize};
@@ -18,6 +19,7 @@ const IGNORED_DIRS: &[&str] = &[
 ];
 
 const MAX_READ_BYTES: u64 = 50 * 1024 * 1024;
+const MAX_BINARY_READ_BYTES: u64 = 100 * 1024 * 1024;
 const MAX_SEARCH_FILE_BYTES: u64 = 5 * 1024 * 1024;
 const MAX_REGEX_SIZE_BYTES: usize = 1 << 20;
 const DEFAULT_MAX_DEPTH: usize = 8;
@@ -40,6 +42,15 @@ pub struct FilePayload {
     pub content: String,
     pub encoding: String,
     pub line_ending: String,
+    pub size_bytes: u64,
+    pub modified_ms: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct BinaryFilePayload {
+    pub path: String,
+    pub name: String,
+    pub base64: String,
     pub size_bytes: u64,
     pub modified_ms: u64,
 }
@@ -251,6 +262,31 @@ pub fn read_file_smart(path: String) -> Result<FilePayload, String> {
         content,
         encoding,
         line_ending,
+        size_bytes: meta.len(),
+        modified_ms: modified_ms_from_meta(&meta),
+    })
+}
+
+#[tauri::command]
+pub fn read_binary_file(path: String) -> Result<BinaryFilePayload, String> {
+    validate_safe_path(&path)?;
+    let p = Path::new(&path);
+    let meta = fs::metadata(p).map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
+    if meta.len() > MAX_BINARY_READ_BYTES {
+        return Err(format!(
+            "Binary file '{}' exceeds maximum readable size ({} bytes > {} bytes)",
+            path,
+            meta.len(),
+            MAX_BINARY_READ_BYTES
+        ));
+    }
+    let bytes = fs::read(p).map_err(|e| format!("Failed to read '{}': {}", path, e))?;
+    let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
+
+    Ok(BinaryFilePayload {
+        path: path_to_string(p),
+        name: file_name_from_path(p),
+        base64: encoded,
         size_bytes: meta.len(),
         modified_ms: modified_ms_from_meta(&meta),
     })
@@ -729,6 +765,27 @@ mod tests {
         )
         .unwrap_err();
         assert!(re_err.contains("Invalid search pattern"));
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_read_binary_file_pdf() {
+        let dir = make_temp_dir();
+        let pdf_path = dir.join("sample.pdf");
+        let raw = b"%PDF-1.4\n1 0 obj\n<<>>\nendobj\n%%EOF\n";
+        fs::write(&pdf_path, raw).unwrap();
+
+        let payload = read_binary_file(pdf_path.to_string_lossy().to_string()).unwrap();
+        assert_eq!(payload.name, "sample.pdf");
+        assert_eq!(payload.size_bytes, raw.len() as u64);
+        let decoded = base64::engine::general_purpose::STANDARD
+            .decode(&payload.base64)
+            .unwrap();
+        assert_eq!(decoded, raw);
+
+        let err = read_binary_file("bad\0file.pdf".to_string()).unwrap_err();
+        assert!(err.contains("NUL"));
+
         let _ = fs::remove_dir_all(&dir);
     }
 }

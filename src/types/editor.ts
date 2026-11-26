@@ -14,6 +14,14 @@ export interface FilePayload {
   modified_ms: number;
 }
 
+export interface BinaryFilePayload {
+  path: string;
+  name: string;
+  base64: string;
+  size_bytes: number;
+  modified_ms: number;
+}
+
 export interface TreeNode {
   name: string;
   path: string;
@@ -96,6 +104,7 @@ export type LanguageId =
   | "go"
   | "php"
   | "shell"
+  | "pdf"
   | "plaintext";
 
 export type ThemeId =
@@ -135,6 +144,9 @@ export interface EditorTab {
   cursorCount: number;
   selectionLength: number;
   validation?: ValidationResult;
+  isBinary?: boolean;
+  binaryBase64?: string;
+  sizeBytes?: number;
 }
 
 export interface CursorInfo {

@@ -1,7 +1,7 @@
 {
   "name": "kunai",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Kunai — Sublime/Zed-class smart code & text editor with Notepad++ utilities and native modern format support",
   "type": "module",
   "scripts": {
@@ -44,6 +44,7 @@
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.475.0",
     "marked": "^15.0.7",
+    "pdfjs-dist": "^6.5.438",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

@@ -66,6 +66,7 @@ Scriptable and executable files (`.html`, `.svg`, `.js`, `.ts`, `.sh`, `.rs`, et
   - **JSON / YAML / TOML** (pretty-printed formatted view + Interactive Tree Inspector + live **JSONPath** query + 1-click JSON ↔ YAML ↔ TOML ↔ CSV conversion)
   - **XML / CSS / SQL** (pretty-printed, indented, syntax-colored text preview)
   - **CSV / TSV** (aligned pretty text + escaped Data Table)
+  - **Fast Sandboxed PDF Viewer**: HiDPI lazy canvas rendering (`IntersectionObserver`), offline bundled PDF.js worker, thumbnails & bookmarks rail, `Fit Width` / `Fit Page` / `Ctrl+Wheel` zoom, rotation, in-PDF full-text search (`Ctrl+F`), split-pane PDF + notes/code, and 1-click **Extract Text to Tab** — zero `<iframe>` and PDF scripting disabled.
 - **Live Linting & Validation**: Real-time line/column diagnostics for JSON, YAML, TOML, and XML.
 
 ### Notepad++ Power Utilities (Native Rust Engine)

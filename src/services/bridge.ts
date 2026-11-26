@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import type {
+  BinaryFilePayload,
   DiffResult,
   DocStats,
   FilePayload,
@@ -10,6 +11,7 @@ import type {
   TreeNode,
   ValidationResult,
 } from "../types/editor";
+import { uint8ArrayToBase64 } from "../utils/samplePdf";
 import {
   buildDemoTree,
   DEMO_WORKSPACE_NAME,
@@ -37,6 +39,17 @@ export function isTauriRuntime(): boolean {
 const demoFiles = new Map<string, string>(
   SAMPLE_FILES.map((file) => [file.path, file.content])
 );
+
+const demoBinaryFiles = new Map<string, string>(
+  SAMPLE_FILES.filter((file) => file.isBinary && file.binaryBase64).map((file) => [
+    file.path,
+    file.binaryBase64 as string,
+  ])
+);
+
+export function isPdfPath(pathOrName: string): boolean {
+  return pathOrName.trim().toLowerCase().endsWith(".pdf");
+}
 
 export function getDemoWorkspaceInfo() {
   return {
@@ -74,6 +87,25 @@ export async function readFileSmart(path: string): Promise<FilePayload> {
     encoding: "UTF-8",
     line_ending: "LF",
     size_bytes: new TextEncoder().encode(content).length,
+    modified_ms: Date.now(),
+  };
+}
+
+export async function readBinaryFile(path: string): Promise<BinaryFilePayload> {
+  if (isTauriRuntime() && !path.startsWith("demo://")) {
+    return invoke<BinaryFilePayload>("read_binary_file", { path });
+  }
+
+  const base64 = demoBinaryFiles.get(path);
+  if (base64 === undefined) {
+    throw new Error(`Binary file not found in workspace: ${path}`);
+  }
+  const approxBytes = Math.floor((base64.length * 3) / 4);
+  return {
+    path,
+    name: getFileName(path),
+    base64,
+    size_bytes: approxBytes,
     modified_ms: Date.now(),
   };
 }
@@ -303,11 +335,18 @@ export async function computeStats(content: string): Promise<DocStats> {
 // Native OS Dialogs (Tauri) + Browser File Input / Download Fallbacks
 // ============================================================================
 
-export async function pickOpenFile(): Promise<FilePayload | null> {
+export type PickedFileResult =
+  | { kind: "text"; payload: FilePayload }
+  | { kind: "binary"; payload: BinaryFilePayload };
+
+export async function pickOpenFile(): Promise<PickedFileResult | null> {
   if (isTauriRuntime()) {
     const selected = await openDialog({ multiple: false, directory: false });
     if (!selected || typeof selected !== "string") return null;
-    return readFileSmart(selected);
+    if (isPdfPath(selected)) {
+      return { kind: "binary", payload: await readBinaryFile(selected) };
+    }
+    return { kind: "text", payload: await readFileSmart(selected) };
   }
 
   return new Promise((resolve) => {
@@ -319,17 +358,37 @@ export async function pickOpenFile(): Promise<FilePayload | null> {
         resolve(null);
         return;
       }
-      const content = await file.text();
       const virtualPath = `${DEMO_WORKSPACE_ROOT}/${file.name}`;
+      if (isPdfPath(file.name)) {
+        const buffer = await file.arrayBuffer();
+        const base64 = uint8ArrayToBase64(new Uint8Array(buffer));
+        demoFiles.set(virtualPath, "");
+        demoBinaryFiles.set(virtualPath, base64);
+        resolve({
+          kind: "binary",
+          payload: {
+            path: virtualPath,
+            name: file.name,
+            base64,
+            size_bytes: file.size,
+            modified_ms: file.lastModified || Date.now(),
+          },
+        });
+        return;
+      }
+      const content = await file.text();
       demoFiles.set(virtualPath, content);
       resolve({
-        path: virtualPath,
-        name: file.name,
-        content,
-        encoding: "UTF-8",
-        line_ending: content.includes("\r\n") ? "CRLF" : "LF",
-        size_bytes: file.size,
-        modified_ms: file.lastModified || Date.now(),
+        kind: "text",
+        payload: {
+          path: virtualPath,
+          name: file.name,
+          content,
+          encoding: "UTF-8",
+          line_ending: content.includes("\r\n") ? "CRLF" : "LF",
+          size_bytes: file.size,
+          modified_ms: file.lastModified || Date.now(),
+        },
       });
     };
     input.click();

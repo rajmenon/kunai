@@ -1,9 +1,12 @@
 import type { TreeNode } from "../types/editor";
+import { getSampleGuidePdfBase64 } from "../utils/samplePdf";
 
 export interface SampleFileEntry {
   path: string;
   name: string;
   content: string;
+  isBinary?: boolean;
+  binaryBase64?: string;
 }
 
 export const DEMO_WORKSPACE_NAME = "kunai-demo";
@@ -420,6 +423,13 @@ HTTP_RESPONSE_HEADER
 -- Sample Epoch Timestamp (try Epoch -> ISO!) --
 1700000000
 `,
+  },
+  {
+    path: "demo://kunai-demo/docs/kunai-guide.pdf",
+    name: "kunai-guide.pdf",
+    content: "",
+    isBinary: true,
+    binaryBase64: getSampleGuidePdfBase64(),
   },
 ];
 

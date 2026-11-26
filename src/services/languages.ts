@@ -183,6 +183,14 @@ export const LANGUAGE_META: Record<LanguageId, LanguageMeta> = {
     color: "#4ade80",
     extensions: ["sh", "bash", "zsh", "ps1", "bat", "cmd", "env"],
   },
+  pdf: {
+    id: "pdf",
+    label: "PDF Document",
+    shortLabel: "PDF",
+    color: "#f43f5e",
+    extensions: ["pdf"],
+    previewable: true,
+  },
   plaintext: {
     id: "plaintext",
     label: "Plain Text",

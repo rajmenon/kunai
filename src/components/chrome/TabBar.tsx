@@ -21,6 +21,7 @@ const LANG_META: Record<LanguageId, { color: string; badge: string }> = {
   go: { color: "#22d3ee", badge: "GO" },
   php: { color: "#a855f7", badge: "PHP" },
   shell: { color: "#34d399", badge: "SH" },
+  pdf: { color: "#f43f5e", badge: "PDF" },
   plaintext: { color: "#94a3b8", badge: "TXT" },
 };
 

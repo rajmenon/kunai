@@ -9,6 +9,7 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![
             fs_ops::read_file_smart,
+            fs_ops::read_binary_file,
             fs_ops::write_file_smart,
             fs_ops::list_workspace_tree,
             fs_ops::create_fs_entry,

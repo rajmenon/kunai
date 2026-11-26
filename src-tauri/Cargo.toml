@@ -1,6 +1,6 @@
 [package]
 name = "kunai"
-version = "0.1.0"
+version = "0.2.0"
 description = "Kunai smart code and text editor"
 authors = ["Kunai"]
 edition = "2021"
